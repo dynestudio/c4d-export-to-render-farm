@@ -10,5 +10,6 @@ Please email info@dynetv.com with any questions, bug reports or feature requests
 Your info can be your name, where are you from, your Behance or something where we can view what you do and know each other 🍻.   
 
 License   
-Export to Render Farm - For commercial and personal uses. The Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.   
+Export to Render Farm - For commercial and personal uses.   
+Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.   
 Export to Render Farm belongs to Dyne Tools (group of digital tools from dyne).
