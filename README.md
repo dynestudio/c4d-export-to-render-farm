@@ -11,4 +11,4 @@ Your info can be your name, where are you from, your Behance or something where 
 
 License   
 Export to Render Farm - For commercial and personal uses. The Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.   
-Export to Render Farm belongs to Dyne Tools (group of tools of dyne).
+Export to Render Farm belongs to Dyne Tools (group of digital tools from dyne).
