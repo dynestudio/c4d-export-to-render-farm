@@ -21,6 +21,11 @@ print 'hola'
 
 print 'chao'
 
+def eso():
+	print 'algo'
+
+print eso()
+
 import c4d
 from c4d import gui
 
