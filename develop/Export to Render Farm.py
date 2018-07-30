@@ -1,12 +1,12 @@
 """
-Export to Render Farm_v04
-Thanks for purchasing - for commercial and all uses.
+Export to Render Farm_v06
+Thanks for download - for commercial and all uses.
 
 be.net/dyne
 Writen by: Carlos Dordelly
 
 Colleect your files and set more easily your render paths
-Date: 03/06/2017
+Date: 06/06/2017
 Written and tested in Cinema 4D R18 / R17 / R16 - Maybe works in older versions.
 
 """
@@ -22,6 +22,7 @@ rdata = doc.GetActiveRenderData()
 doc=c4d.documents.GetActiveDocument()
 docname=doc.GetDocumentName()
 docpath=doc.GetDocumentPath()
+docfolder=docname[:-4]
 
 
 def GetArnoldRenderSettings():
@@ -45,7 +46,18 @@ def GetArnoldRenderSettings():
              
     return None
 
-"""
+def Arnold_Safety_Checks():
+        #C4DtoA Lines
+        # find the Arnold video post data   
+        arnoldRenderSettings = GetArnoldRenderSettings()
+        if arnoldRenderSettings is None:
+            raise BaseException("Failed to find Arnold render settings")
+         
+        # setup the settings
+        arnoldRenderSettings[c4d.C4DAI_OPTIONS_LOCK_SAMPLING_PATTERN] = True
+        arnoldRenderSettings[c4d.C4DAI_OPTIONS_USE_TX_TEXTURES] = True
+        arnoldRenderSettings[c4d.C4DAI_OPTIONS_DISPLAY_BUCKETS]=0
+
 def get_frames():
 
     #Active Document
@@ -68,10 +80,20 @@ def get_frames():
         framefrom = rdata[c4d.RDATA_FRAMEFROM].GetFrame(doc.GetFps())
         frameto = rdata[c4d.RDATA_FRAMETO].GetFrame(doc.GetFps())
     
-    #print frames sequence
-    print "frame from: "+str(framefrom)
-    print "frame to: "+str(frameto)
-"""
+    return str(framefrom)+"-"+str(frameto)
+
+def write_txt(n_docpath,n_docname,n_docfolder):
+
+    frames=get_frames()
+    fileformat=".txt"
+
+    txtfilename=n_docpath+"/"+n_docfolder+"_frames to render_"+frames+fileformat
+    print "Collected log saved in " + txtfilename
+
+    f=open(txtfilename,"w")
+    f.write(n_docname+" "+frames)
+    f.close()
+
 
 def export_to_renderfarm():
 
@@ -82,13 +104,15 @@ def export_to_renderfarm():
     container = rdata.GetData()
 
     #Render setting collect name
-    rdata[c4d.ID_BASELIST_NAME]= "_"+docname+"_To Render Farm"
+    rdata[c4d.ID_BASELIST_NAME]= "_"+docfolder+"_To Render Farm"
 
     #Output Formats
+    #Beauty
     if rdata[c4d.RDATA_RENDERENGINE] == ARNOLD_RENDERER:
         BeautyFormat = ARNOLD_DUMMYFORMAT #ArnoldDummy Format
     if not  rdata[c4d.RDATA_RENDERENGINE] == ARNOLD_RENDERER:
         BeautyFormat = c4d.FILTER_JPG #Beauty reference in JPG format
+    #MultiPass
     MPFormat=c4d.FILTER_EXR
     
     container[c4d.RDATA_FORMAT] = BeautyFormat
@@ -112,16 +136,7 @@ def export_to_renderfarm():
     
     #Arnold Render Settings Safety check
     if rdata[c4d.RDATA_RENDERENGINE] == ARNOLD_RENDERER:
-        #C4DtoA Lines
-        # find the Arnold video post data   
-        arnoldRenderSettings = GetArnoldRenderSettings()
-        if arnoldRenderSettings is None:
-            raise BaseException("Failed to find Arnold render settings")
-         
-        # setup the settings
-        arnoldRenderSettings[c4d.C4DAI_OPTIONS_LOCK_SAMPLING_PATTERN] = True
-        arnoldRenderSettings[c4d.C4DAI_OPTIONS_USE_TX_TEXTURES] = True
-        arnoldRenderSettings[c4d.C4DAI_OPTIONS_DISPLAY_BUCKETS]=0
+        Arnold_Safety_Checks()
     if not  rdata[c4d.RDATA_RENDERENGINE] == ARNOLD_RENDERER:
         None
 
@@ -132,15 +147,20 @@ def export_to_renderfarm():
     c4d.CallCommand(12255, 12255) # Save Project with Assets...
     
     #Write codument with frames and path settings
-    #print docname
-    #print docpath
+    #New documents IDs
+    n_docpath=doc.GetDocumentPath()
+    n_docname=doc.GetDocumentName()
+    n_docfolder=n_docname[:-4]
+
+    write_txt(n_docpath, n_docname, n_docfolder)
+    print "Collected file: "+n_docname
 
     #Close the collected file
     c4d.CallCommand(12664, 12664) # Close collected project
     c4d.CallCommand(52000, 2) # Recent Files
     
     #Collect finish dialog
-    gui.MessageDialog('Sucessfully Exported')
+    gui.MessageDialog("Successfully Exported!\nSee the console for more details.")
 
 
 if __name__=='__main__':
