@@ -1,5 +1,5 @@
 """
-Export to Render Farm - C4D script 0.9 wip 07
+Export to Render Farm - C4D script 0.9 wip 08
 Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
@@ -8,7 +8,7 @@ Writen by: Carlos Dordelly
 Special thanks: Pancho Contreras, Terry Williams & Roberto Gonzalez.
 
 Export to Render Farm provides a alternative way to collect a c4d file with additional features.
-Date start: 03/03/2018
+Date start: 07/04/2018
 date end: --
 Written and tested in Cinema 4D R19 / R18 / R17 / R16.
 
@@ -143,6 +143,19 @@ def Arnold_Safety_Checks():
 
 def update_driversPath(padding):
 
+     #padding ops
+     if padding == 1:
+        padding = 0
+     elif padding == 2:
+        padding = 3
+     else:
+        padding = padding
+     #padding underscore
+     if padding == 0:
+        padding_space = ""
+     else:
+        padding_space = "_"
+
      padding = "#"*padding
 
      #drivers objects list
@@ -180,7 +193,7 @@ def update_driversPath(padding):
 
           path_id = c4d.DescID(c4d.DescLevel(driver_filename), c4d.DescLevel(1))
           driver_name = driver_name.replace(" ","_")
-          driver_custom_path = "./$prj/$prj_" + driver_name + "_" + padding + driver_format
+          driver_custom_path = "./$prj/$prj_" + driver_name + padding_space + padding + driver_format
           
           if not driver_type == C4DAIN_DRIVER_DISPLAY:
                obj.SetParameter(path_id, driver_custom_path, c4d.DESCFLAGS_SET_0)
@@ -300,7 +313,7 @@ def Redshift_Log_Data():
         if randomize_pattern == True:
             randomize_pattern = "Enabled"
         else:
-            randomize_pattern == "Disabled"
+            randomize_pattern = "Disabled"
         randomize_pattern = "Randomize Pattern Every Frame: " + randomize_pattern
 
         #sampling overrides
