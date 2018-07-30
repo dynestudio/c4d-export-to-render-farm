@@ -1,5 +1,5 @@
 """
-Export to Render Farm - C4D script 0.9 wip 03
+Export to Render Farm - C4D script 0.9 wip 05
 Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
@@ -8,8 +8,8 @@ Writen by: Carlos Dordelly
 Special thanks: Pancho Contreras, Terry Williams & Roberto Gonzalez.
 
 Export to Render Farm provides a alternative way to collect a c4d file with additional features.
-Date: 08/12/2017
-Written and tested in Cinema 4D R18 / R17 / R16 - Not tested in older versions.
+Date: 03/02/2018
+Written and tested in Cinema 4D R19 / R18 / R17 / R16 - Not tested in older versions.
 
 Export to Render Farm belongs to Dyne Tools (group of digital tools from dyne).
 
@@ -19,13 +19,17 @@ import c4d
 from c4d import gui
 
 #global render engines ids
+#arnold ids
 ARNOLD_RENDERER = 1029988
 ARNOLD_RENDERER_COMMAND = 1039333
 ARNOLD_DUMMYFORMAT = 1035823
 ARNOLD_DRIVER = 1030141
 
-REDSHIFT_RENDERER = 1036219
+#octane ids
 OCTANE_RENDERER = 1029525
+
+REDSHIFT_RENDERER = 1036219
+PRO_RENDERER = 1037639
 PHYSICAL_RENDERER = 1023342
 STANDARD_RENDERER = 0
 
@@ -40,6 +44,31 @@ doc=c4d.documents.GetActiveDocument()
 docname=doc.GetDocumentName()
 docpath=doc.GetDocumentPath()
 docfolder=docname[:-4]
+
+#cinema 4D version
+def get_c4d_ver():
+    
+    C4D_ver = str(c4d.GetC4DVersion())
+    C4D_ver = C4D_ver[:2] + "." + C4D_ver[2:]
+    version_to_log = "Cinema 4D R" + C4D_ver
+    C4DR_ver = C4D_ver[:2]
+    
+    ver_list = [version_to_log,C4DR_ver]
+
+    return ver_list
+
+C4D_version = get_c4d_ver()
+C4D_version_log = C4D_version[0]
+C4DR_ver = C4D_version[1]
+
+#get all objects with children
+def get_all_objects(op, filter, output):
+    while op:
+        if filter(op):
+            output.append(op)
+        get_all_objects(op.GetDown(), filter, output)
+        op = op.GetNext()
+    return output
 
 # ---start render engines settings--- #
 
@@ -106,26 +135,23 @@ def Arnold_Log_Data():
         transparency_depth = "Transparency Depth = " + str(arnoldRenderSettings[c4d.C4DAIP_OPTIONS_AUTO_TRANSPARENCY_DEPTH])
 
         #drivers to log
-        #scene objects list
-        objectsList = doc.GetObjects()
+        #drivers objects list
+        objectsList = get_all_objects(doc.GetFirstObject(), lambda x: x.CheckType(ARNOLD_DRIVER), [])
 
         driver_list = []
 
         for obj in objectsList:
-            obj_type = obj.GetType()
-            if obj_type == ARNOLD_DRIVER:
-                  driver_name = obj[c4d.ID_BASELIST_NAME]
-                  driver_name = "Driver: " + driver_name
-                  driver_list.append("\n")
-                  driver_list.append(driver_name)
-                  driver_AOVs = obj.GetChildren()
+              driver_name = obj[c4d.ID_BASELIST_NAME]
+              driver_name = "Driver: " + driver_name
+              driver_list.append("\n")
+              driver_list.append(driver_name)
+              driver_AOVs = obj.GetChildren()
 
-                  for aov in driver_AOVs:
-                    AOV_name = aov[c4d.ID_BASELIST_NAME]
-                    AOV_name = "AOV: " + AOV_name
-                    driver_list.append(AOV_name)
-            else:
-                  None
+              for aov in driver_AOVs:
+                AOV_name = aov[c4d.ID_BASELIST_NAME]
+                AOV_name = "AOV: " + AOV_name
+                driver_list.append(AOV_name)
+
         if len(driver_list) == 0:
             driver_list.append("\n")
             driver_empty = "There aren't any driver in this project."
@@ -458,7 +484,7 @@ def GetOctaneRenderSettings():
              
     return None
 
-def Octane_Safety_Checks():
+def Octane_Safety_Checks(docpath,docname):
         # find the Octane video post data   
         octaneRenderSettings = GetOctaneRenderSettings()
         if octaneRenderSettings is None:
@@ -466,7 +492,9 @@ def Octane_Safety_Checks():
          
         # setup the settings
         octaneRenderSettings[c4d.SET_PASSES_ENABLED] = True
-        octaneRenderSettings[c4d.SET_PASSES_SAVEPATH] = MP_path
+        docname = docname.replace(" ","_")
+        octane_mp_path = docpath + "/" + docname[:-4] + MP_path[-8:]
+        octaneRenderSettings[c4d.SET_PASSES_SAVEPATH] = octane_mp_path
         Pxr24 = 5 #pixar EXR compression
         octaneRenderSettings[c4d.SET_PASSES_EXR_COMPR] = Pxr24
         octaneRenderSettings[c4d.SET_PASSES_SHOWPASSES] = True
@@ -838,6 +866,7 @@ def write_txt(n_docpath, n_docname, n_docfolder, render_log, output_data_format)
     f.write("Project Name: "+n_docname[:-4]+"\n\n")
     output_data_format = str('\n'.join(output_data_format))
     f.write(output_data_format+"\n\n")
+    f.write(C4D_version_log+"\n\n")
     f.write("Render Engine: "+active_render_engine_string()+"\n\n")
     render_log = str('\n'.join(render_log))
     f.write(render_log)
@@ -855,7 +884,7 @@ def export_to_renderfarm():
     render_engine = rdata[c4d.RDATA_RENDERENGINE]
 
     #Render setting collect name
-    renderdata[c4d.ID_BASELIST_NAME]= "_"+docfolder+"_To Render Farm"
+    renderdata[c4d.ID_BASELIST_NAME] = "_"+docfolder+"_To Render Farm"
 
     #Output Render File Formats
     #Beauty
@@ -863,13 +892,24 @@ def export_to_renderfarm():
         BeautyFormat = ARNOLD_DUMMYFORMAT #ArnoldDummy Format
     elif render_engine == REDSHIFT_RENDERER:
         BeautyFormat = ARNOLD_DUMMYFORMAT #ArnoldDummy Format
+    elif render_engine == OCTANE_RENDERER:
+        BeautyFormat = c4d.FILTER_PNG
+
     else:
         BeautyFormat = c4d.FILTER_JPG #Beauty reference in JPG format
+
     #MultiPass
     MPFormat=c4d.FILTER_EXR
     
     container[c4d.RDATA_FORMAT] = BeautyFormat
 
+    #octane set 16bits beauty
+    if render_engine == OCTANE_RENDERER:
+        container[c4d.RDATA_FORMATDEPTH] = 1
+    else:
+        None
+
+    #arnold beauty alpha uncheck
     if render_engine == ARNOLD_RENDERER:
         container[c4d.RDATA_ALPHACHANNEL]=False
     else:
@@ -883,27 +923,27 @@ def export_to_renderfarm():
     bc[0] = 3 # ZIP
     bc[1] = True # clamp to half float
     
-    # save OpenEXR options & continer data
+    # save OpenEXR options & container data
     saveOptions.SetContainer(0,bc)
     renderdata.SetData(container)
 
     #set render paths
-    renderdata[c4d.RDATA_PATH] = Beauty_path #beauty export is not necessary with some 3rd party renders just like C4DtoA
+    renderdata[c4d.RDATA_PATH] = Beauty_path #beauty export is not necessary with C4DtoA and Redshift
 
     if render_engine == OCTANE_RENDERER:
         renderdata[c4d.RDATA_MULTIPASS_FILENAME] = ""
-        renderdata[c4d.RDATA_MULTIPASS_SAVEIMAGE] = False
-    else:
         renderdata[c4d.RDATA_MULTIPASS_SAVEIMAGE] = True
+    else:
         renderdata[c4d.RDATA_MULTIPASS_FILENAME] = MP_path #MP = Multipass
+        renderdata[c4d.RDATA_MULTIPASS_SAVEIMAGE] = True    
     
-    #Safety checks settings in render engine
+    #Safety checks settings in the render engine
     if render_engine == ARNOLD_RENDERER:
         Arnold_Safety_Checks()
     elif render_engine == REDSHIFT_RENDERER:
         Redshift_Safety_Checks()
     elif render_engine == OCTANE_RENDERER:
-        Octane_Safety_Checks()
+        None #Octane_Safety_Checks() -- to get the correct MP path, the safety checks will be executed later
     elif render_engine == PHYSICAL_RENDERER:
         Physical_Safety_Checks()
     else:
@@ -914,9 +954,19 @@ def export_to_renderfarm():
 
     #Collect New File
     c4d.CallCommand(12255, 12255) # Save Project with Assets...
+
+    #octane correct multipass path
+    if render_engine == OCTANE_RENDERER:
+        doc=c4d.documents.GetActiveDocument()
+        docname=doc.GetDocumentName()
+        docpath=doc.GetDocumentPath()
+        Octane_Safety_Checks(docpath,docname)
+    else:
+        None
     
     #Write codument with log information
     #New documents IDs
+    doc=c4d.documents.GetActiveDocument()
     n_docpath=doc.GetDocumentPath()
     n_docname=doc.GetDocumentName()
     n_docfolder=n_docname[:-4]
@@ -952,7 +1002,10 @@ def export_to_renderfarm():
     
     #Collect finish dialog
     print "Successfully Exported! Happy Rendering ;)"
-    gui.MessageDialog("Successfully Exported!\nSee the console and log for more details.")
+    if int(C4DR_ver) == 19:
+        gui.MessageDialog("Successfully Exported!\nRemember to change the EXR compression to\n16 scan lines in the Render Settings.")
+    else:
+        gui.MessageDialog("Successfully Exported!\nSee the console and log for more details.")
 
 
 if __name__=='__main__':
