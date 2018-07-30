@@ -475,7 +475,7 @@ def Octane_Log_Data():
         octane_depth_list = []
         octane_log_list = []
 
-        return redshift_log_list
+        return octane_log_list
 
 #physical renderer
 def GetPhysicalRenderSettings():
@@ -852,7 +852,11 @@ def export_to_renderfarm():
     MPFormat=c4d.FILTER_EXR
     
     container[c4d.RDATA_FORMAT] = BeautyFormat
-    container[c4d.RDATA_ALPHACHANNEL]=False
+
+    if render_engine == ARNOLD_RENDERER:
+        container[c4d.RDATA_ALPHACHANNEL]=False
+    else:
+        container[c4d.RDATA_ALPHACHANNEL] = True
     
     container[c4d.RDATA_MULTIPASS_SAVEFORMAT] = MPFormat
     saveOptions = container.GetContainerInstance(c4d.RDATA_MULTIPASS_SAVEOPTIONS)
