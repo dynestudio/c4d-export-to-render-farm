@@ -1,5 +1,5 @@
 """
-Export to Render Farm Update Paths - C4D script 0.1.5
+Export to Render Farm Update Paths - C4D script 0.3.1
 Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
