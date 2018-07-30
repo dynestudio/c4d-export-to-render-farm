@@ -1,5 +1,5 @@
 """
-Export to Render Farm Update Team Server Paths - C4D script 0.1
+Export to Render Farm Update Team Server Paths - C4D script 0.2
 Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
@@ -9,7 +9,7 @@ Special thanks: Pancho Contreras, Terry Williams & Roberto Gonzalez.
 
 Export to Render Farm provides a alternative way to collect a c4d file with additional features.
 Date start: 13/feb/2018
-Date version: 09/jun/2018
+Date version: 30/jul/2018
 Date end: --
 Written and tested in Cinema 4D R19 / R18 / R17 / R16.
 
@@ -45,10 +45,11 @@ C4DAIP_DRIVER_PNG_FILENAME      = 1807654404
 C4DAIP_DRIVER_TIFF_FILENAME     = 1913388456
 
 #render data global ids
-renderdata   = doc.GetActiveRenderData()
-rdata        = renderdata.GetData()
-Beauty_path  = "./$prj/$prj_Beauty"
-MP_path      = "./users/admin/$prj/results/$prj_MP"
+renderdata       = doc.GetActiveRenderData()
+rdata            = renderdata.GetData()
+Beauty_path      = ""
+MP_path          = ""
+team_server_path = "./users/admin/$prj/results/$prj_"
 
 #document global ids
 doc=c4d.documents.GetActiveDocument()
@@ -182,7 +183,7 @@ def main(): #export_to_renderfarm update paths main function
 
             path_id = c4d.DescID(c4d.DescLevel(driver_filename), c4d.DescLevel(1))
             driver_name = driver_name.replace(" ","_")
-            driver_custom_path = "./$prj/$prj_" + driver_name + padding_space + padding + driver_format
+            driver_custom_path = team_server_path + driver_name + padding_space + padding + driver_format
               
             if not driver_type == C4DAIN_DRIVER_DISPLAY:
                 driver.SetParameter(path_id, driver_custom_path, c4d.DESCFLAGS_SET_0)
