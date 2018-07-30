@@ -1,5 +1,5 @@
 """
-Export to Render Farm - C4D script 0.9 wip 05
+Export to Render Farm - C4D script 0.9 wip 06
 Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
@@ -8,7 +8,7 @@ Writen by: Carlos Dordelly
 Special thanks: Pancho Contreras, Terry Williams & Roberto Gonzalez.
 
 Export to Render Farm provides a alternative way to collect a c4d file with additional features.
-Date start: 13/02/2018
+Date start: 25/02/2018
 date end: --
 Written and tested in Cinema 4D R19 / R18 / R17 / R16.
 
@@ -21,42 +21,58 @@ from c4d import gui
 
 #global render engines ids
 #arnold ids
-ARNOLD_RENDERER = 1029988
-ARNOLD_RENDERER_COMMAND = 1039333
-ARNOLD_DUMMYFORMAT = 1035823
-ARNOLD_DRIVER = 1030141
+ARNOLD_RENDERER                   = 1029988
+ARNOLD_RENDERER_COMMAND           = 1039333
+ARNOLD_DUMMYFORMAT                = 1035823
+ARNOLD_DRIVER                     = 1030141
+C4DAIP_DRIVER_EXR_HALF_PRECISION  = 317968755
+
+#driver types
+C4DAIN_DRIVER_EXR      = 9504161
+C4DAIN_DRIVER_DEEPEXR  = 1058716317
+C4DAIN_DRIVER_JPEG     = 313466666
+C4DAIN_DRIVER_PNG      = 9492523
+C4DAIN_DRIVER_TIFF     = 313114887
+C4DAIN_DRIVER_DISPLAY  = 1927516736
+
+#drivers file names
+C4DAIP_DRIVER_EXR_FILENAME      = 1285755954
+C4DAIP_DRIVER_JPEG_FILENAME     = 766183461
+C4DAIP_DRIVER_DEEPEXR_FILENAME  = 1429220916
+C4DAIP_DRIVER_PNG_FILENAME      = 1807654404
+C4DAIP_DRIVER_TIFF_FILENAME     = 1913388456
 
 #octane ids
-OCTANE_RENDERER = 1029525
-OCTANE_LIVEPLUGIN = 1029499
+OCTANE_RENDERER    = 1029525
+OCTANE_LIVEPLUGIN  = 1029499
 
 #other render engines ids
-REDSHIFT_RENDERER = 1036219
-PRO_RENDERER = 1037639
-PHYSICAL_RENDERER = 1023342
-STANDARD_RENDERER = 0
+REDSHIFT_RENDERER  = 1036219
+PRO_RENDERER       = 1037639
+PHYSICAL_RENDERER  = 1023342
+STANDARD_RENDERER  = 0
 
 #render data global ids
-renderdata = doc.GetActiveRenderData()
-rdata = renderdata.GetData()
-Beauty_path = "./$prj/$prj_Beauty"
-MP_path = "./$prj/$prj_MP"
+renderdata   = doc.GetActiveRenderData()
+rdata        = renderdata.GetData()
+Beauty_path  = "./$prj/$prj_Beauty"
+MP_path      = "./$prj/$prj_MP"
 
 #document global ids
-doc=c4d.documents.GetActiveDocument()
-docname=doc.GetDocumentName()
-docpath=doc.GetDocumentPath()
-docfolder=docname[:-4]
+doc        = c4d.documents.GetActiveDocument()
+docname    = doc.GetDocumentName()
+docpath    = doc.GetDocumentPath()
+docfolder  = docname[:-4]
 
 #cinema 4D version
 def get_c4d_ver():
     
-    C4D_ver = str(c4d.GetC4DVersion())
-    C4D_ver = C4D_ver[:2] + "." + C4D_ver[2:]
-    version_to_log = "Cinema 4D R" + C4D_ver
-    C4DR_ver = C4D_ver[:2]
+    C4D_ver         = str(c4d.GetC4DVersion())
+    C4D_ver         = C4D_ver[:2] + "." + C4D_ver[2:]
+    version_to_log  = "Cinema 4D R" + C4D_ver
+    C4DR_ver        = C4D_ver[:2]
     
-    ver_list = [version_to_log,C4DR_ver]
+    ver_list        = [version_to_log,C4DR_ver]
 
     return ver_list
 
@@ -109,6 +125,66 @@ def Arnold_Safety_Checks():
         arnoldRenderSettings[c4d.C4DAI_OPTIONS_AUTO_TX] = True
         arnoldRenderSettings[c4d.C4DAI_OPTIONS_DISPLAY_BUCKETS] = 0
 
+        # drivers safety checks
+        objectsList = get_all_objects(doc.GetFirstObject(), lambda x: x.CheckType(ARNOLD_DRIVER), [])
+        for obj in objectsList:
+            obj[c4d.C4DAI_DRIVER_ENABLE_AOVS] = True
+            obj[c4d.C4DAI_DRIVER_MERGE_AOVS] = True
+
+            driver_name = obj[c4d.ID_BASELIST_NAME]
+            driver_type = obj[c4d.C4DAI_DRIVER_TYPE]
+            if driver_type == C4DAIN_DRIVER_EXR:
+                if not driver_name == "crypto":
+                    obj[C4DAIP_DRIVER_EXR_HALF_PRECISION] = True
+                else:
+                    obj[C4DAIP_DRIVER_EXR_HALF_PRECISION] = False
+            else:
+                None
+
+def update_driversPath():
+
+     #drivers objects list
+     objectsList = get_all_objects(doc.GetFirstObject(), lambda x: x.CheckType(ARNOLD_DRIVER), [])
+
+     for obj in objectsList:
+          driver_name = obj[c4d.ID_BASELIST_NAME]
+          driver_type = obj[c4d.C4DAI_DRIVER_TYPE]
+
+          if driver_type == C4DAIN_DRIVER_EXR:
+               driver_filename = C4DAIP_DRIVER_EXR_FILENAME
+          elif driver_type == C4DAIN_DRIVER_DEEPEXR:
+               driver_filename = C4DAIP_DRIVER_DEEPEXR_FILENAME
+          elif driver_type == C4DAIN_DRIVER_TIFF:
+               driver_filename = C4DAIP_DRIVER_TIFF_FILENAME
+          elif driver_type == C4DAIN_DRIVER_PNG:
+               driver_filename = C4DAIP_DRIVER_PNG_FILENAME
+          elif driver_type == C4DAIN_DRIVER_JPEG:
+               driver_filename = C4DAIP_DRIVER_JPEG_FILENAME
+          else:
+               driver_filename = 0
+
+          if driver_type == C4DAIN_DRIVER_EXR:
+               driver_format = ".exr"
+          elif driver_type == C4DAIN_DRIVER_DEEPEXR:
+               driver_format = ".exr"
+          elif driver_type == C4DAIN_DRIVER_TIFF:
+               driver_format = ".tiff"
+          elif driver_type == C4DAIN_DRIVER_PNG:
+               driver_format = ".png"
+          elif driver_type == C4DAIN_DRIVER_JPEG:
+               driver_format = ".jpg"
+          else:
+               driver_format = ""
+
+          path_id = c4d.DescID(c4d.DescLevel(driver_filename), c4d.DescLevel(1))
+          driver_name = driver_name.replace(" ","_")
+          driver_custom_path = "./$prj/$prj_" + driver_name + driver_format
+          
+          if not driver_type == C4DAIN_DRIVER_DISPLAY:
+               obj.SetParameter(path_id, driver_custom_path, c4d.DESCFLAGS_SET_0)
+          else:
+               None
+
 def Arnold_Log_Data():
         # find the Arnold video post data   
         arnoldRenderSettings = GetArnoldRenderSettings()
@@ -137,8 +213,8 @@ def Arnold_Log_Data():
         volume_depth = "Volume Depth = " + str(arnoldRenderSettings[c4d.C4DAIP_OPTIONS_GI_VOLUME_DEPTH])
         transparency_depth = "Transparency Depth = " + str(arnoldRenderSettings[c4d.C4DAIP_OPTIONS_AUTO_TRANSPARENCY_DEPTH])
 
-        #drivers to log
-        #drivers objects list
+        # drivers to log
+        # drivers objects list
         objectsList = get_all_objects(doc.GetFirstObject(), lambda x: x.CheckType(ARNOLD_DRIVER), [])
 
         driver_list = []
@@ -1323,10 +1399,11 @@ def export_to_renderfarm():
     #Safety checks settings in the render engine
     if render_engine == ARNOLD_RENDERER:
         Arnold_Safety_Checks()
+        update_driversPath()
     elif render_engine == REDSHIFT_RENDERER:
         Redshift_Safety_Checks()
     elif render_engine == OCTANE_RENDERER:
-        None #Octane_Safety_Checks() -- to get the correct MP path, the safety checks will be executed later
+        None #Octane_Safety_Checks() -- to get the correct MP path, the safety checks will be execute later
     elif render_engine == PHYSICAL_RENDERER:
         Physical_Safety_Checks()
     else:
