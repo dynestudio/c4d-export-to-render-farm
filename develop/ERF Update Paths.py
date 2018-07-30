@@ -1,5 +1,5 @@
 """
-Export to Render Farm Update Paths - C4D script 0.1 wip 02
+Export to Render Farm Update Paths - C4D script 0.1 wip 03
 Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
@@ -8,8 +8,8 @@ Writen by: Carlos Dordelly
 Special thanks: Pancho Contreras, Terry Williams & Roberto Gonzalez.
 
 Export to Render Farm provides a alternative way to collect a c4d file with additional features.
-Date start: 16/02/2018
-Date version:
+Date start: 13/feb/2018
+Date version: 08/apr/2018
 Date end: --
 Written and tested in Cinema 4D R19 / R18 / R17 / R16.
 
@@ -21,18 +21,18 @@ import c4d
 from c4d import gui
 
 #global render engines ids
-ARNOLD_RENDERER = 1029988
-OCTANE_RENDERER = 1029525
-REDSHIFT_RENDERER = 1036219
-PRO_RENDERER = 1037639
-PHYSICAL_RENDERER = 1023342
-STANDARD_RENDERER = 0
+ARNOLD_RENDERER    = 1029988
+OCTANE_RENDERER    = 1029525
+REDSHIFT_RENDERER  = 1036219
+PRO_RENDERER       = 1037639
+PHYSICAL_RENDERER  = 1023342
+STANDARD_RENDERER  = 0
 
 #render data global ids
-renderdata = doc.GetActiveRenderData()
-rdata = renderdata.GetData()
-Beauty_path = "./$prj/$prj_Beauty"
-MP_path = "./$prj/$prj_MP"
+renderdata   = doc.GetActiveRenderData()
+rdata        = renderdata.GetData()
+Beauty_path  = "./$prj/$prj_Beauty"
+MP_path      = "./$prj/$prj_MP"
 
 #document global ids
 doc=c4d.documents.GetActiveDocument()
@@ -74,11 +74,11 @@ def active_render_engine_string():
     elif render_engine == STANDARD_RENDERER:
         render_engine = "Standard Renderer"
     else:
-        render_engine = rdata[c4d.RDATA_RENDERENGINE]
+        render_engine = "Unrecognizable Render Engine: " + str(rdata[c4d.RDATA_RENDERENGINE])
+
     return render_engine
 
-def export_to_renderfarm():
-
+def main(): #export_to_renderfarm update paths main function
     render_engine = active_render_engine_string()
     print render_engine+" detected" #render engine from the scene
     render_engine = rdata[c4d.RDATA_RENDERENGINE]
@@ -96,5 +96,6 @@ def export_to_renderfarm():
 
     gui.MessageDialog("The render paths was successfully updated!\nSee the console and log for more details.")
 
+
 if __name__=='__main__':
-    export_to_renderfarm()
+    main()
