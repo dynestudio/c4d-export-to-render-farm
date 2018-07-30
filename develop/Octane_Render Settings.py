@@ -1,9 +1,7 @@
 import c4d
 
 OCTANE_LIVEPLUGIN = 1029499
-OCTANE_CAMERATAG = 1029524
 OCTANE_RENDERER = 1029525
-OCTANE_VIDEOPOST = 1005172
 
 def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
 
@@ -25,7 +23,7 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
     octane[3001] = int(data.GetReal(3001))
 
     #Info Kernel
-    if kernelLV == 0 :
+    if kernelLV == 0:
 
         render_kernel = "Render Kernel: Infochannels"
 
@@ -150,7 +148,7 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
                                     alphachan, par_samples, maxtile_samp, min_net_traffic, ""]
 
     #Direct Lighting  
-    if kernelLV == 1 :
+    if kernelLV == 1:
         
         render_kernel = "Render Kernel: Direct Lighting"
 
@@ -250,7 +248,7 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
                                     noise_thresh, min_samples, exp_exposure, grp_pixels , ""]
 
     #Path Tracing
-    if kernelLV == 2 :
+    if kernelLV == 2:
 
         render_kernel = "Render Kernel: Path Tracing"
 
@@ -341,7 +339,7 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
                                     par_samples, maxtile_samp, min_net_traffic, adaptive_sampling_log, noise_thresh, min_samples, exp_exposure, grp_pixels, ""]
     
     #PMC
-    if kernelLV == 3 :
+    if kernelLV == 3:
         
         render_kernel = "Render Kernel: PMC"
 
@@ -395,8 +393,6 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
         octane_kernelsettings_list = [render_kernel, "", max_samples, diffuse_depth, glos_depth, ray_epsilon, Filter,
                                     ashadow, causticblur, GI_clamp, achan, keep_env, pter_power, explostrength, dlimportance,
                                     maxrejects, parallelism, chunk_size, ""]
-
-    print octane_kernelsettings_list #for develop purposes
 
     octane_log_list = []
 
