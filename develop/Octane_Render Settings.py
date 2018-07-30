@@ -144,7 +144,7 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the settings base 
         else:
             min_net_traffic = "Minimize net traffic: " + "Disabled"
 
-        adaptive_sampling_list = 
+        adaptive_sampling_list = []
 
         adaptive_sampling = octane[c4d.SET_DIRECT_ADAPTIVE_SAMPLING] = bool(data.GetReal(c4d.SET_DIRECT_ADAPTIVE_SAMPLING))
         if adaptive_sampling == True:
@@ -154,18 +154,21 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the settings base 
         noise_thresh = octane[c4d.SET_DIRECT_ASAMP_NOISE_THRESH] = float(data.GetReal(c4d.SET_DIRECT_ASAMP_NOISE_THRESH))
         if adaptive_sampling == True:
             noise_thresh = "Noise threshold = " + str(noise_thresh)
+            adaptive_sampling_list.append(noise_thresh)
         else:
-            noise_thresh = ""
+            None
         min_samples = octane[c4d.SET_DIRECT_ASAMP_MIN_SAMPLES] = int(data.GetReal(c4d.SET_DIRECT_ASAMP_MIN_SAMPLES))
         if adaptive_sampling == True:
             min_samples = "Min. samples = " + str(min_samples)
+            adaptive_sampling_list.append(min_samples)
         else:
-            min_samples = ""
+            None
         exp_exposure = octane[c4d.SET_DIRECT_ASAMP_EXP_EXPOSURE] = float(data.GetReal(c4d.SET_DIRECT_ASAMP_EXP_EXPOSURE))
         if adaptive_sampling == True:
             exp_exposure = "Expected exposure = " + str(exp_exposure)
+            adaptive_sampling_list.append(exp_exposure)
         else:
-            exp_exposure = ""
+            None
         grp_pixels = octane[c4d.SET_DIRECT_ASAMP_GRP_PIXELS] = int(data.GetReal(c4d.SET_DIRECT_ASAMP_GRP_PIXELS))
         if adaptive_sampling == True:
             if grp_pixels == 0:
@@ -175,15 +178,17 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the settings base 
             else:
                 grp_pixels = "4x4"
             grp_pixels = "Group pixels: " + grp_pixels
+            adaptive_sampling_list.append(grp_pixels)
         else:
-            grp_pixels = ""
+            None
         
         c4d.EventAdd(1)
 
         octane_kernelsettings_list = [render_kernel, "", max_samples, direct_gimod, specular_depth, glos_depth, diffuse_depth, 
                                     ray_epsilon, Filter, AO_dist, alphashd, alphachan, keep_env, pter_power, coherentratio, 
-                                    stat_noise, par_samples, maxtile_samp, min_net_traffic, adaptive_sampling_log, 
-                                    noise_thresh, min_samples, exp_exposure, grp_pixels , ""]
+                                    stat_noise, par_samples, maxtile_samp, min_net_traffic, adaptive_sampling_log, ""]
+        for i in adaptive_sampling_list:
+            octane_kernelsettings_list.insert(-1, i)
 
     #Path Tracing
     if kernelLV == 2:
@@ -226,6 +231,8 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the settings base 
             min_net_traffic = "Minimize net traffic: " + "Enabled"
         else:
             min_net_traffic = "Minimize net traffic: " + "Disabled"
+
+        adaptive_sampling_list = []
         
         adaptive_sampling = octane[c4d.SET_PATHTRACE_ADAPTIVE_SAMPLING] = bool(data.GetReal(c4d.SET_PATHTRACE_ADAPTIVE_SAMPLING))
         if adaptive_sampling == True:
@@ -235,18 +242,21 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the settings base 
         noise_thresh = octane[c4d.SET_PATHTRACE_ASAMP_NOISE_THRESH] = float(data.GetReal(c4d.SET_PATHTRACE_ASAMP_NOISE_THRESH))
         if adaptive_sampling == True:
             noise_thresh = "Noise threshold = " + str(noise_thresh)
+            adaptive_sampling_list.append(noise_thresh)
         else:
-            noise_thresh = ""
+            None
         min_samples = octane[c4d.SET_PATHTRACE_ASAMP_MIN_SAMPLES] = int(data.GetReal(c4d.SET_PATHTRACE_ASAMP_MIN_SAMPLES))
         if adaptive_sampling == True:
             min_samples = "Min. samples = " + str(min_samples)
+            adaptive_sampling_list.append(min_samples)
         else:
-            min_samples = ""
+            None
         exp_exposure = octane[c4d.SET_PATHTRACE_ASAMP_EXP_EXPOSURE] = float(data.GetReal(c4d.SET_PATHTRACE_ASAMP_EXP_EXPOSURE))
         if adaptive_sampling == True:
             exp_exposure = "Expected exposure = " + str(exp_exposure)
+            adaptive_sampling_list.append(exp_exposure)
         else:
-            exp_exposure = ""
+            None
         grp_pixels = octane[c4d.SET_PATHTRACE_ASAMP_GRP_PIXELS] = int(data.GetReal(c4d.SET_PATHTRACE_ASAMP_GRP_PIXELS))
         if adaptive_sampling == True:
             if grp_pixels == 0:
@@ -256,14 +266,17 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the settings base 
             else:
                 grp_pixels = "4x4"
             grp_pixels = "Group pixels: " + grp_pixels
+            adaptive_sampling_list.append(grp_pixels)
         else:
-            grp_pixels = ""
+            None
         
         c4d.EventAdd(1)
 
         octane_kernelsettings_list = [render_kernel, "", max_samples, diffuse_depth, specular_depth, ray_epsilon, Filter,
                                     ashadow, causticblur, GI_clamp, achan, keep_env, pter_power, coherentratio, stat_noise,
-                                    par_samples, maxtile_samp, min_net_traffic, adaptive_sampling_log, noise_thresh, min_samples, exp_exposure, grp_pixels, ""]
+                                    par_samples, maxtile_samp, min_net_traffic, adaptive_sampling_log, ""]
+        for i in adaptive_sampling_list:
+            octane_kernelsettings_list.insert(-1, i)
     
     #PMC
     if kernelLV == 3:
@@ -311,7 +324,7 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the settings base 
 
     for i in octane_kernelsettings_list:
         octane_log_list.append(i)
-
+    
     return octane_log_list
 
 if __name__=='__main__':
