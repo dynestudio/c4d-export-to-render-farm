@@ -122,7 +122,7 @@ def Arnold_Safety_Checks():
     # setup the settings
     arnoldRenderSettings[c4d.C4DAI_OPTIONS_LOCK_SAMPLING_PATTERN] = True
     arnoldRenderSettings[c4d.C4DAI_OPTIONS_USE_TX_TEXTURES] = True
-    arnoldRenderSettings[c4d.C4DAI_OPTIONS_AUTO_TX] = True
+    arnoldRenderSettings[c4d.C4DAI_OPTIONS_AUTO_TX] = False # temporal, luego tendra dialogo de decision
     arnoldRenderSettings[c4d.C4DAI_OPTIONS_DISPLAY_BUCKETS] = 0
     C4DAI_OPTIONS_DISPLAY_BUCKETS = 213851792
     arnoldRenderSettings[C4DAI_OPTIONS_DISPLAY_BUCKETS] = True
