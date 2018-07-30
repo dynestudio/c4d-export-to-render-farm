@@ -1,5 +1,5 @@
 """
-Export to Render Farm - C4D script 0.9.10
+Export to Render Farm - C4D script 0.9.11
 Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
@@ -20,15 +20,15 @@ Export to Render Farm belongs to Dyne Tools (group of digital tools from dyne).
 import c4d
 from c4d import gui
 
-#global render engines ids
-#arnold ids
+# global render engines ids
+# arnold ids
 ARNOLD_RENDERER                   = 1029988
 ARNOLD_RENDERER_COMMAND           = 1039333
 ARNOLD_DUMMYFORMAT                = 1035823
 ARNOLD_DRIVER                     = 1030141
 C4DAIP_DRIVER_EXR_HALF_PRECISION  = 317968755
 
-#driver types
+# driver types
 C4DAIN_DRIVER_EXR      = 9504161
 C4DAIN_DRIVER_DEEPEXR  = 1058716317
 C4DAIN_DRIVER_JPEG     = 313466666
@@ -36,36 +36,36 @@ C4DAIN_DRIVER_PNG      = 9492523
 C4DAIN_DRIVER_TIFF     = 313114887
 C4DAIN_DRIVER_DISPLAY  = 1927516736
 
-#drivers file names
+# drivers file names
 C4DAIP_DRIVER_EXR_FILENAME      = 1285755954
 C4DAIP_DRIVER_JPEG_FILENAME     = 766183461
 C4DAIP_DRIVER_DEEPEXR_FILENAME  = 1429220916
 C4DAIP_DRIVER_PNG_FILENAME      = 1807654404
 C4DAIP_DRIVER_TIFF_FILENAME     = 1913388456
 
-#octane ids
+# octane ids
 OCTANE_RENDERER    = 1029525
 OCTANE_LIVEPLUGIN  = 1029499
 
-#other render engines ids
+# other render engines ids
 REDSHIFT_RENDERER  = 1036219
 PRO_RENDERER       = 1037639
 PHYSICAL_RENDERER  = 1023342
 STANDARD_RENDERER  = 0
 
-#render data global ids
+# render data global ids
 renderdata   = doc.GetActiveRenderData()
 rdata        = renderdata.GetData()
 Beauty_path  = "./$prj/$prj_Beauty"
 MP_path      = "./$prj/$prj_MP"
 
-#document global ids
+# document global ids
 doc        = c4d.documents.GetActiveDocument()
 docname    = doc.GetDocumentName()
 docpath    = doc.GetDocumentPath()
 docfolder  = docname[:-4]
 
-#cinema 4D version
+# cinema 4D version
 def get_c4d_ver():
     
     C4D_ver         = str(c4d.GetC4DVersion())
@@ -81,7 +81,7 @@ C4D_version =     get_c4d_ver()
 C4D_version_log = C4D_version[0]
 C4DR_ver =        C4D_version[1]
 
-#get all objects with children
+# get all objects with children
 def get_all_objects(op, filter, output):
     while op:
         if filter(op):
@@ -92,7 +92,7 @@ def get_all_objects(op, filter, output):
 
 # ---start render engines settings--- #
 
-#arnold renderer
+# arnold renderer
 def GetArnoldRenderSettings(): #thanks to c4dtoa support for this code
     # find the active Arnold render settings
     videopost = renderdata.GetFirstVideoPost()
@@ -124,6 +124,8 @@ def Arnold_Safety_Checks():
     arnoldRenderSettings[c4d.C4DAI_OPTIONS_USE_TX_TEXTURES] = True
     arnoldRenderSettings[c4d.C4DAI_OPTIONS_AUTO_TX] = True
     arnoldRenderSettings[c4d.C4DAI_OPTIONS_DISPLAY_BUCKETS] = 0
+    C4DAI_OPTIONS_DISPLAY_BUCKETS = 213851792
+    arnoldRenderSettings[C4DAI_OPTIONS_DISPLAY_BUCKETS] = True
 
     # drivers safety checks
     objectsList = get_all_objects(doc.GetFirstObject(), lambda x: x.CheckType(ARNOLD_DRIVER), [])
@@ -272,7 +274,7 @@ def Arnold_Log_Data():
 
     return arnold_log_list
 
-#redshift renderer
+# redshift renderer
 def GetRedshiftRenderSettings():
     # find the active Redshift render settings
     videopost = renderdata.GetFirstVideoPost()
@@ -566,7 +568,7 @@ def Redshift_Log_Data():
 
     return redshift_log_list
 
-#octane renderer
+# octane renderer
 def GetOctaneRenderSettings():
     # find the active Octane render settings
     videopost = renderdata.GetFirstVideoPost()
@@ -596,7 +598,7 @@ def Octane_Safety_Checks(docpath,docname):
     octaneRenderSettings[c4d.SET_PASSES_IMAGECOLORPROFILE] = 1
     octaneRenderSettings[c4d.SET_PASSES_TONEMAPTYPE] = 1
 
-def Octane_Log_Data(): #thanks to the octane user: mpazera for the settings base code
+def Octane_Log_Data(): # thanks to the octane user: mpazera for the settings base code
     #octane IDs
     sBC = doc.GetDataInstance();
     data = sBC.GetContainerInstance(OCTANE_LIVEPLUGIN)
@@ -907,7 +909,7 @@ def Octane_Log_Data(): #thanks to the octane user: mpazera for the settings base
     
     return octane_log_list
 
-#physical renderer
+# physical renderer
 def GetPhysicalRenderSettings():
     # find the active Physical render settings
     videopost = renderdata.GetFirstVideoPost()
@@ -1032,7 +1034,7 @@ def Physical_Log_Data():
 
     return physical_log_list
 
-#standard renderer
+# standard renderer
 def Standard_Safety_Checks():
     # setup the settings
     renderdata[c4d.RDATA_ANTIALIASING] = 2
@@ -1044,7 +1046,7 @@ def Standard_Safety_Checks():
     renderdata[c4d.RDATA_OPTION_REFLECTION] = True
     renderdata[c4d.RDATA_OPTION_SHADOW] = True
     renderdata[c4d.RDATA_NOISE_LOCK] = True
-    renderdata[c4d.RDATA_AUTOLIGHT] = False
+    renderdata[c4d.RDATA_AUTOLIGHT] = True # future decision with dialog
 
 def Standard_Log_Data():
     # options to log
@@ -1305,7 +1307,7 @@ def active_render_engine_string():
     return render_engine
 
 def get_frames():
-    #Get Frames info
+    # Get Frames info
     if rdata[c4d.RDATA_FRAMESEQUENCE] == c4d.RDATA_FRAMESEQUENCE_ALLFRAMES:
         framefrom = doc[c4d.DOCUMENT_MINTIME].GetFrame(doc.GetFps())
         frameto = doc[c4d.DOCUMENT_MAXTIME].GetFrame(doc.GetFps())
@@ -1345,22 +1347,22 @@ def write_txt(n_docpath, n_docname, n_docfolder, render_log, output_data_format,
     f.write(missingAssets_log)
     f.close()
 
-def main(): #export_to_renderfarm main function
-    #collect start
+def main(): # export_to_renderfarm main function
+    # collect start
     save=c4d.CallCommand(12098) # Save
 
-    #function variables
+    # function variables
     container = renderdata.GetData()
     render_engine = active_render_engine_string()
-    #render engine from the scene
+    # render engine from the scene
     print render_engine+" detected"
     render_engine = rdata[c4d.RDATA_RENDERENGINE]
 
-    #Render setting collect name
+    # Render setting collect name
     renderdata[c4d.ID_BASELIST_NAME] = "_"+docfolder+"_To Render Farm"
 
-    #Output Render File Formats
-    #Beauty output
+    # Output Render File Formats
+    # Beauty output
     if render_engine == ARNOLD_RENDERER:
         BeautyFormat = ARNOLD_DUMMYFORMAT #ArnoldDummy Format
     elif render_engine == REDSHIFT_RENDERER:
@@ -1370,18 +1372,21 @@ def main(): #export_to_renderfarm main function
     else:
         BeautyFormat = c4d.FILTER_JPG #Beauty reference in JPG format
 
-    #MultiPass / AOVs output
-    MPFormat=c4d.FILTER_EXR
+    # MultiPass / AOVs output
+    if render_engine == ARNOLD_RENDERER:
+        MPFormat = ARNOLD_DUMMYFORMAT
+    else:
+        MPFormat = c4d.FILTER_EXR
     
     container[c4d.RDATA_FORMAT] = BeautyFormat
 
-    #octane set 16bits beauty
+    # octane set 16bits beauty
     if render_engine == OCTANE_RENDERER:
         container[c4d.RDATA_FORMATDEPTH] = 1
     else:
         None
 
-    #arnold beauty alpha uncheck
+    # arnold beauty alpha uncheck
     if render_engine == ARNOLD_RENDERER:
         container[c4d.RDATA_ALPHACHANNEL]=False
     else:
@@ -1417,7 +1422,6 @@ def main(): #export_to_renderfarm main function
         #drivers ops
         padding = get_frames()
         padding = padding[1]
-        print padding
         padding = len(str(padding))
         update_driversPath(padding)
 
