@@ -1,12 +1,12 @@
 """
-Export to Render Farm_v07
+Export to Render Farm_v08
 Thanks for download - for commercial and all uses.
 
 be.net/dyne
 Writen by: Carlos Dordelly
 
 Colleect your files and set more easily your render paths
-Date: 11/11/2017
+Date: 13/11/2017
 Written and tested in Cinema 4D R18 / R17 / R16 - Maybe works in older versions.
 
 """
@@ -18,6 +18,7 @@ from c4d import gui
 ARNOLD_RENDERER = 1029988
 ARNOLD_RENDERER_COMMAND = 1039333
 ARNOLD_DUMMYFORMAT = 1035823
+ARNOLD_DRIVER = 1030141
 
 REDSHIFT_RENDERER = 1036219
 OCTANE_RENDERER = 1029525
@@ -34,11 +35,7 @@ docname=doc.GetDocumentName()
 docpath=doc.GetDocumentPath()
 docfolder=docname[:-4]
 
-
-
 # ---start render engines settings--- #
-
-
 
 #arnold renderer
 def GetArnoldRenderSettings():
@@ -74,7 +71,6 @@ def Arnold_Safety_Checks():
         arnoldRenderSettings[c4d.C4DAI_OPTIONS_AUTO_TX] = True
         arnoldRenderSettings[c4d.C4DAI_OPTIONS_DISPLAY_BUCKETS] = 0
 
-
 def Arnold_Log_Data():
         # find the Arnold video post data   
         arnoldRenderSettings = GetArnoldRenderSettings()
@@ -92,7 +88,7 @@ def Arnold_Log_Data():
         sampling_pattern = arnoldRenderSettings[c4d.C4DAI_OPTIONS_LOCK_SAMPLING_PATTERN]
         if sampling_pattern == 1:
             sampling_pattern = True
-        if not sampling_pattern == 1:
+        else:
             sampling_pattern = False
         sampling_pattern = "Sampling Pattern = " + str(sampling_pattern)
 
@@ -103,15 +99,48 @@ def Arnold_Log_Data():
         volume_depth = "Volume Depth = " + str(arnoldRenderSettings[c4d.C4DAIP_OPTIONS_GI_VOLUME_DEPTH])
         transparency_depth = "Transparency Depth = " + str(arnoldRenderSettings[c4d.C4DAIP_OPTIONS_AUTO_TRANSPARENCY_DEPTH])
 
+        #drivers to log
+        #scene objects list
+        objectsList = doc.GetObjects()
+
+        driver_list = []
+
+        for obj in objectsList:
+            obj_type = obj.GetType()
+            if obj_type == ARNOLD_DRIVER:
+                  driver_name = obj[c4d.ID_BASELIST_NAME]
+                  driver_name = "Driver: " + driver_name
+                  driver_list.append("\n")
+                  driver_list.append(driver_name)
+                  driver_AOVs = obj.GetChildren()
+
+                  for aov in driver_AOVs:
+                    AOV_name = aov[c4d.ID_BASELIST_NAME]
+                    AOV_name = "AOV: " + AOV_name
+                    driver_list.append(AOV_name)
+            else:
+                  None
+        if len(driver_list) == 0:
+            driver_list.append("\n")
+            driver_empty = "There aren't any driver in this project."
+            driver_list.append(driver_empty)
+
         #lists to log
         arnold_samples_list = ["C4DtoA Samplings:", "", AA_samples, diffuse_samples, specular_samples, transmission_samples, sss_samples, volume_indirect_samples, sampling_pattern, ""]
         arnold_depth_list = ["C4DtoA Ray Depth:", "", depth_total, diffuse_depth, specular_depth, transmission_depth, volume_depth, transparency_depth, ""]
+        arnold_driver_list = ["Arnold Drivers:"]
         arnold_log_list = []
 
         for i in arnold_samples_list:
             arnold_log_list.append(i)
 
         for i in arnold_depth_list:
+            arnold_log_list.append(i)
+
+        for i in driver_list:
+            arnold_driver_list.append(i)
+
+        for i in arnold_driver_list:
             arnold_log_list.append(i)
 
         return arnold_log_list
@@ -135,8 +164,12 @@ def Redshift_Safety_Checks():
             raise BaseException("Failed to find Redshift render settings")
          
         # setup the settings
-        None
-
+        redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_DEBUG_DRAW_SAMPLES] = False
+        redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_RANDOMIZE_PATTERN] = True
+        redshiftRenderSettings[c4d.REDSHIFT_RENDERER_AOV_FIX_RAW_HALO_ARTIFACTS] = True
+        redshiftRenderSettings[c4d.REDSHIFT_RENDERER_CONSERVE_GI_REFLECTION_ENERGY] = True
+        redshiftRenderSettings[c4d.REDSHIFT_RENDERER_AUTOMATIC_MEMORY_MANAGEMENT] = True
+        redshiftRenderSettings[c4d.REDSHIFT_RENDERER_INTEGRATION_OPTIONS_DEFAULT_LIGHT] = False
 
 def Redshift_Log_Data():
         # find the Redshift video post data   
@@ -145,12 +178,265 @@ def Redshift_Log_Data():
             raise BaseException("Failed to find Redshift render settings")
         
         # settings to log
-        None
+        #unifed sampling
+        samples_min = "Samples Min = " + str(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_MIN_SAMPLES])
+        samples_max = "Samples Max = " + str(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_MAX_SAMPLES])
+        adaptive_error_threshold = "Adaptive Error Threshold = " + str(round(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_ADAPTIVE_ERROR_THRESHOLD],4))
+        
+        randomize_pattern = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_RANDOMIZE_PATTERN]
+        if randomize_pattern == 1:
+            randomize_pattern = True
+        else:
+            randomize_pattern == False
+        randomize_pattern = "Randomize Pattern Every Frame = " + str(randomize_pattern)
+
+        #sampling overrides
+        #override reflection
+        override_samples_reflection = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_REFLECT_SAMPLES_ENABLED]
+        if override_samples_reflection == False:
+            override_samples_reflection = "Override Reflection: Disabled"
+        else:
+            override_samples_reflection = "Override Reflection: Enabled"
+
+            override_samples_reflection_mode = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_REFLECT_SAMPLES_MODE]
+            if override_samples_reflection_mode == 0:
+                override_samples_reflection_mode = "Mode: Replace"
+                override_samples_reflection_samples = "Override Samples = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_REFLECT_SAMPLES_COUNT]))
+                override_samples_reflection_list = [override_samples_reflection_mode, override_samples_reflection_samples, ""]
+            else:
+                override_samples_reflection_mode = "Mode: Scale"
+                override_samples_reflection_samples = "Override Scale = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_REFLECT_SAMPLES_SCALE]))
+                override_samples_reflection_list = [override_samples_reflection_mode, override_samples_reflection_samples, ""]
+
+            override_samples_reflection_mode = "Override Samples Reflection Mode: " + override_samples_reflection_mode
+
+        override_samples_reflection_mode_list = [override_samples_reflection]
+        override_samples_reflection_mode_list_space = [""]
+
+        if override_samples_reflection == "Override Reflection: Enabled":
+            for i in override_samples_reflection_list:
+                override_samples_reflection_mode_list.append(i)
+        else:
+            for i in override_samples_reflection_mode_list_space:
+                override_samples_reflection_mode_list.append(i)
+
+        #override refraction
+        override_samples_refraction = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_REFRACT_SAMPLES_ENABLED]
+        if override_samples_refraction == False:
+            override_samples_refraction = "Override Refraction: Disabled"
+        else:
+            override_samples_refraction = "Override Refraction: Enabled"
+
+            override_samples_refraction_mode = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_REFRACT_SAMPLES_MODE]
+            if override_samples_refraction_mode == 0:
+                override_samples_refraction_mode = "Mode: Replace"
+                override_samples_refraction_samples = "Override Samples = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_REFRACT_SAMPLES_COUNT]))
+                override_samples_refraction_list = [override_samples_refraction_mode, override_samples_refraction_samples, ""]
+            else:
+                override_samples_refraction_mode = "Mode: Scale"
+                override_samples_refraction_samples = "Override Scale = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_REFRACT_SAMPLES_SCALE]))
+                override_samples_refraction_list = [override_samples_refraction_mode, override_samples_refraction_samples, ""]
+
+            override_samples_refraction_mode = "Override Samples Refraction Mode: " + override_samples_refraction_mode
+
+        override_samples_refraction_mode_list = [override_samples_refraction]
+        override_samples_refraction_mode_list_space = [""]
+
+        if override_samples_refraction == "Override Refraction: Enabled":
+            for i in override_samples_refraction_list:
+                override_samples_refraction_mode_list.append(i)
+        else:
+            for i in override_samples_refraction_mode_list_space:
+                override_samples_refraction_mode_list.append(i)
+
+        #override AO
+        override_samples_AO = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_AO_SAMPLES_ENABLED]
+        if override_samples_AO == False:
+            override_samples_AO = "Override AO: Disabled"
+        else:
+            override_samples_AO = "Override AO: Enabled"
+
+            override_samples_AO_mode = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_AO_SAMPLES_MODE]
+            if override_samples_AO_mode == 0:
+                override_samples_AO_mode = "Mode: Replace"
+                override_samples_AO_samples = "Override Samples = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_AO_SAMPLES_COUNT]))
+                override_samples_AO_list = [override_samples_AO_mode, override_samples_AO_samples, ""]
+            else:
+                override_samples_AO_mode = "Mode: Scale"
+                override_samples_AO_samples = "Override Scale = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_AO_SAMPLES_SCALE]))
+                override_samples_AO_list = [override_samples_AO_mode, override_samples_AO_samples, ""]
+
+            override_samples_AO_mode = "Override Samples AO Mode: " + override_samples_AO_mode
+
+        override_samples_AO_mode_list = [override_samples_AO]
+        override_samples_AO_mode_list_space = [""]
+
+        if override_samples_AO == "Override AO: Enabled":
+            for i in override_samples_AO_list:
+                override_samples_AO_mode_list.append(i)
+        else:
+            for i in override_samples_AO_mode_list_space:
+                override_samples_AO_mode_list.append(i)
+
+        #override light
+        override_samples_light = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_LIGHT_SAMPLES_ENABLED]
+        if override_samples_light == False:
+            override_samples_light = "Override Light: Disabled"
+        else:
+            override_samples_light = "Override Light: Enabled"
+
+            override_samples_light_mode = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_LIGHT_SAMPLES_MODE]
+            if override_samples_light_mode == 0:
+                override_samples_light_mode = "Mode: Replace"
+                override_samples_light_samples = "Override Samples = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_LIGHT_SAMPLES_COUNT]))
+                override_samples_light_list = [override_samples_light_mode, override_samples_light_samples, ""]
+            else:
+                override_samples_light_mode = "Mode: Scale"
+                override_samples_light_samples = "Override Scale = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_LIGHT_SAMPLES_SCALE]))
+                override_samples_light_list = [override_samples_light_mode, override_samples_light_samples, ""]
+
+            override_samples_light_mode = "Override Samples Light Mode: " + override_samples_light_mode
+
+        override_samples_light_mode_list = [override_samples_light]
+        override_samples_light_mode_list_space = [""]
+
+        if override_samples_light == "Override Light: Enabled":
+            for i in override_samples_light_list:
+                override_samples_light_mode_list.append(i)
+        else:
+            for i in override_samples_light_mode_list_space:
+                override_samples_light_mode_list.append(i)
+
+        #override volume
+        override_samples_volume = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_VOLUME_SAMPLES_ENABLED]
+        if override_samples_volume == False:
+            override_samples_volume = "Override Volume: Disabled"
+        else:
+            override_samples_volume = "Override Volume: Enabled"
+
+            override_samples_volume_mode = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_VOLUME_SAMPLES_MODE]
+            if override_samples_volume_mode == 0:
+                override_samples_volume_mode = "Mode: Replace"
+                override_samples_volume_samples = "Override Samples = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_VOLUME_SAMPLES_COUNT]))
+                override_samples_volume_list = [override_samples_volume_mode, override_samples_volume_samples, ""]
+            else:
+                override_samples_volume_mode = "Mode: Scale"
+                override_samples_volume_samples = "Override Scale = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_VOLUME_SAMPLES_SCALE]))
+                override_samples_volume_list = [override_samples_volume_mode, override_samples_volume_samples, ""]
+
+            override_samples_volume_mode = "Override Samples Volume Mode: " + override_samples_volume_mode
+
+        override_samples_volume_mode_list = [override_samples_volume]
+        override_samples_volume_mode_list_space = [""]
+
+        if override_samples_volume == "Override Volume: Enabled":
+            for i in override_samples_volume_list:
+                override_samples_volume_mode_list.append(i)
+        else:
+            for i in override_samples_volume_mode_list_space:
+                override_samples_volume_mode_list.append(i)
+
+        #override single scattering
+        override_samples_single_scatter = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_SINGLE_SCATTERING_SAMPLES_ENABLED]
+        if override_samples_single_scatter == False:
+            override_samples_single_scatter = "Override Single Scattering: Disabled"
+        else:
+            override_samples_single_scatter = "Override Single Scattering: Enabled"
+
+            override_samples_single_scatter_mode = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_SINGLE_SCATTERING_SAMPLES_MODE]
+            if override_samples_single_scatter_mode == 0:
+                override_samples_single_scatter_mode = "Mode: Replace"
+                override_samples_single_scatter_samples = "Override Samples = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_SINGLE_SCATTERING_SAMPLES_COUNT]))
+                override_samples_single_scatter_list = [override_samples_single_scatter_mode, override_samples_single_scatter_samples, ""]
+            else:
+                override_samples_single_scatter_mode = "Mode: Scale"
+                override_samples_single_scatter_samples = "Override Scale = " + str(int(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_SINGLE_SCATTERING_SAMPLES_SCALE]))
+                override_samples_single_scatter_list = [override_samples_single_scatter_mode, override_samples_single_scatter_samples, ""]
+
+            override_samples_single_scatter_mode = "Override Samples Single Scattering Mode: " + override_samples_single_scatter_mode
+
+        override_samples_single_scatter_mode_list = [override_samples_single_scatter]
+        override_samples_single_scatter_mode_list_space = [""]
+
+        if override_samples_single_scatter == "Override Single Scattering: Enabled":
+            for i in override_samples_single_scatter_list:
+                override_samples_single_scatter_mode_list.append(i)
+        else:
+            for i in override_samples_single_scatter_mode_list_space:
+                override_samples_single_scatter_mode_list.append(i)
+
+        #GI
+        primary_engine = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_PRIMARY_GI_ENGINE]
+        if primary_engine == 0:
+            primary_engine = "None"
+        elif primary_engine == 1:
+            primary_engine = "Photon Map"
+        elif primary_engine == 2:
+            primary_engine = "None"
+        elif primary_engine == 3:
+            primary_engine = "Irradiance Cache"
+        elif primary_engine == 4:
+            primary_engine = "Brute Force"
+        primary_engine = "Primary GI Engine: " + primary_engine
+
+        secondary_engine = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_SECONDARY_GI_ENGINE]
+        if secondary_engine == 0:
+            secondary_engine = "None"
+        elif secondary_engine == 1:
+            secondary_engine = "Photon Map"
+        elif secondary_engine == 2:
+            secondary_engine = "Irradiance Point Cloud"
+        elif secondary_engine == 3:
+            secondary_engine = "None"
+        elif secondary_engine == 4:
+            secondary_engine = "Brute Force"
+        secondary_engine = "Secondary GI Engine: " + secondary_engine
+
+        GI_bounces = "Number of GI Bounces = " + str(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_NUM_GI_BOUNCES])
+
+        GI_reflect_energy = redshiftRenderSettings[c4d.REDSHIFT_RENDERER_CONSERVE_GI_REFLECTION_ENERGY]
+        if GI_reflect_energy == False:
+            GI_reflect_energy = "Disabled"
+        else:
+            GI_reflect_energy = "Enabled"
+        GI_reflect_energy = "Converse Reflections Energy: " + GI_reflect_energy
+
+        GI_rays = "Brute Force GI - Number of Rays = " + str(redshiftRenderSettings[c4d.REDSHIFT_RENDERER_BRUTE_FORCE_GI_NUM_RAYS])
 
         #lists to log
-        redshift_samples_list = []
-        redshift_depth_list = []
+        redshift_samples_list = ["Unifed Samplings:", "", samples_min, samples_max, adaptive_error_threshold, randomize_pattern, ""]
+        redshift_override_list = ["Samplings Overrides:", ""]
+        redshift_engine_list = ["GI Engines:", "", primary_engine, secondary_engine, GI_bounces, GI_reflect_energy, GI_rays, ""]
         redshift_log_list = []
+
+        for i in redshift_samples_list:
+            redshift_log_list.append(i)
+
+        #overrides start
+        for i in override_samples_reflection_mode_list:
+            redshift_override_list.append(i)
+
+        for i in override_samples_refraction_mode_list:
+            redshift_override_list.append(i)
+
+        for i in override_samples_AO_mode_list:
+            redshift_override_list.append(i)
+
+        for i in override_samples_light_mode_list:
+            redshift_override_list.append(i)
+
+        for i in override_samples_volume_mode_list:
+            redshift_override_list.append(i)
+
+        for i in override_samples_single_scatter_mode_list:
+            redshift_override_list.append(i)
+        #override ends
+
+        for i in redshift_override_list:
+            redshift_log_list.append(i)
+
+        for i in redshift_engine_list:
+            redshift_log_list.append(i)
 
         return redshift_log_list
 
@@ -174,7 +460,6 @@ def Octane_Safety_Checks():
          
         # setup the settings
         None
-
 
 def Octane_Log_Data():
         # find the Octane video post data   
@@ -237,7 +522,7 @@ def Physical_Log_Data():
         shading_transparency_check = physicalRenderSettings[c4d.VP_XMB_RAYTRACING_SAMPLES_SHADING_TRANS]
         if shading_transparency_check == 1:
             shading_transparency_check = True
-        if not shading_transparency_check == 1:
+        else:
             shading_transparency_check = False
         shading_transparency_check = "Shading Transparency Check = "+str(shading_transparency_check)
 
@@ -328,35 +613,34 @@ def Standard_Safety_Checks():
         renderdata[c4d.RDATA_OPTION_SHADOW] = True
         renderdata[c4d.RDATA_NOISE_LOCK] = True
         renderdata[c4d.RDATA_AUTOLIGHT] = False
-        c4d.EventAdd()
 
 def Standard_Log_Data():
         # options to log
         transparency = renderdata[c4d.RDATA_OPTION_TRANSPARENCY]
         if transparency  == 1:
             transparency  = True
-        if not transparency  == 1:
+        else:
             transparency  = False
         transparency  = "Transparency = "+str(transparency)
 
         refraction = renderdata[c4d.RDATA_OPTION_REFRACTION]
         if refraction  == 1:
             refraction  = True
-        if not refraction  == 1:
+        else:
             refraction  = False
         refraction  = "Refraction = "+str(refraction)
 
         reflection = renderdata[c4d.RDATA_OPTION_REFLECTION]
         if reflection  == 1:
             reflection  = True
-        if not reflection  == 1:
+        else:
             reflection  = False
         reflection  = "Reflection = "+str(reflection)
 
         shadow = renderdata[c4d.RDATA_OPTION_SHADOW]
         if shadow  == 1:
             shadow  = True
-        if not shadow  == 1:
+        else:
             shadow  = False
         shadow  = "Shadow = "+str(shadow)
 
@@ -430,8 +714,7 @@ def Standard_Log_Data():
             AA_threshold = "AA Threshold = " + str(int(renderdata[c4d.RDATA_AATHRESHOLD]*100)) + "%"
 
             AA_best_list = [AA_min_level, AA_max_level, AA_threshold]
-
-        if not anti_aliasing == "Best":
+        else:
             None
 
         for i in standard_options_list:
@@ -439,9 +722,8 @@ def Standard_Log_Data():
 
         if anti_aliasing == "Best":
             for i in AA_best_list:
-                standard_AA_list.append(i)
-                    
-        if not anti_aliasing == "Best":
+                standard_AA_list.append(i)        
+        else:
             None
 
         for i in standard_AA_list:
@@ -449,11 +731,7 @@ def Standard_Log_Data():
 
         return standard_log_list
 
-
-
 # ---end render engines settings--- #
-
-
 
 def get_output_data_format():
     # options to log
@@ -480,7 +758,7 @@ def get_output_data_format():
     render_region = renderdata[c4d.RDATA_RENDERREGION]
     if render_region == False:
         render_region = "Render Region: Disabled"
-    elif render_region == True:
+    else:
         render_region = "Render Region: Enabled"
         left_border = "Render Region - Left Border: "+str(int(renderdata[c4d.RDATA_RENDERREGION_LEFT]))
         top_border = "Render Region - Top Border: "+str(int(renderdata[c4d.RDATA_RENDERREGION_TOP]))
@@ -493,7 +771,7 @@ def get_output_data_format():
     if render_region == "Render Region: Enabled":
         for i in render_region_list:
             output_data_list.append(i)
-    if not render_region == "Render Region: Enabled":
+    else:
         None
 
     return output_data_list
@@ -537,23 +815,15 @@ def write_txt(n_docpath, n_docname, n_docfolder, render_log, output_data_format)
     frames=get_frames()
     fileformat=".txt"
 
-    txtfilename=n_docpath+"/"+n_docfolder+"_frames to render_"+frames+fileformat
+    txtfilename=n_docpath+"/"+n_docfolder+"_Frames to Render "+frames+"_(Log file)"+fileformat
     print "Collected log saved in " + txtfilename
 
     f=open(txtfilename,"w")
-    f.write(n_docname+" "+"Frames to render:"+frames)
-    f.write("\n")
-    f.write("\n")
-    f.write("Project Name: "+n_docname[:-4])
-    f.write("\n")
-    f.write("\n")
+    f.write(n_docname+" "+"- Frames to render: "+frames+"\n\n")
+    f.write("Project Name: "+n_docname[:-4]+"\n\n")
     output_data_format = str('\n'.join(output_data_format))
-    f.write(output_data_format)
-    f.write("\n")
-    f.write("\n")
-    f.write("Render Engine: "+active_render_engine_string()+" ")
-    f.write("\n")
-    f.write("\n")
+    f.write(output_data_format+"\n\n")
+    f.write("Render Engine: "+active_render_engine_string()+"\n\n")
     render_log = str('\n'.join(render_log))
     f.write(render_log)
     f.close()
@@ -576,7 +846,7 @@ def export_to_renderfarm():
     #Beauty
     if render_engine == ARNOLD_RENDERER:
         BeautyFormat = ARNOLD_DUMMYFORMAT #ArnoldDummy Format
-    if not render_engine == ARNOLD_RENDERER:
+    else:
         BeautyFormat = c4d.FILTER_JPG #Beauty reference in JPG format
     #MultiPass
     MPFormat=c4d.FILTER_EXR
