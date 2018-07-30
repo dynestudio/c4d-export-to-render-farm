@@ -80,7 +80,7 @@ def active_render_engine_string():
 
 def main(): #export_to_renderfarm update paths main function
     render_engine = active_render_engine_string()
-    print render_engine+" detected" #render engine from the scene
+    print render_engine + " detected" #render engine from the scene
     render_engine = rdata[c4d.RDATA_RENDERENGINE]
 
     renderdata[c4d.RDATA_PATH] = Beauty_path #beauty export is not necessary with C4DtoA and Redshift
