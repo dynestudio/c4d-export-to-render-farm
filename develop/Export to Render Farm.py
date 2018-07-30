@@ -1,5 +1,5 @@
 """
-Export to Render Farm - C4D script 0.9 wip 06
+Export to Render Farm - C4D script 0.9 wip 07
 Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
@@ -8,7 +8,7 @@ Writen by: Carlos Dordelly
 Special thanks: Pancho Contreras, Terry Williams & Roberto Gonzalez.
 
 Export to Render Farm provides a alternative way to collect a c4d file with additional features.
-Date start: 25/02/2018
+Date start: 03/03/2018
 date end: --
 Written and tested in Cinema 4D R19 / R18 / R17 / R16.
 
@@ -141,7 +141,9 @@ def Arnold_Safety_Checks():
             else:
                 None
 
-def update_driversPath():
+def update_driversPath(padding):
+
+     padding = "#"*padding
 
      #drivers objects list
      objectsList = get_all_objects(doc.GetFirstObject(), lambda x: x.CheckType(ARNOLD_DRIVER), [])
@@ -178,7 +180,7 @@ def update_driversPath():
 
           path_id = c4d.DescID(c4d.DescLevel(driver_filename), c4d.DescLevel(1))
           driver_name = driver_name.replace(" ","_")
-          driver_custom_path = "./$prj/$prj_" + driver_name + driver_format
+          driver_custom_path = "./$prj/$prj_" + driver_name + "_" + padding + driver_format
           
           if not driver_type == C4DAIN_DRIVER_DISPLAY:
                obj.SetParameter(path_id, driver_custom_path, c4d.DESCFLAGS_SET_0)
@@ -1304,15 +1306,18 @@ def get_frames():
     else:
         framefrom = rdata[c4d.RDATA_FRAMEFROM].GetFrame(doc.GetFps())
         frameto = rdata[c4d.RDATA_FRAMETO].GetFrame(doc.GetFps())
+
+    frames_log = str(framefrom)+"-"+str(frameto)
     
-    return str(framefrom)+"-"+str(frameto)
+    return [frames_log, frameto]
 
 def write_txt(n_docpath, n_docname, n_docfolder, render_log, output_data_format, missingAssets_log):
 
-    frames=get_frames()
-    fileformat=".txt"
+    frames      = get_frames()
+    frames      = frames[0]
+    fileformat  =".txt"
 
-    txtfilename=n_docpath+"/"+n_docfolder+"_Frames to Render "+frames+"_(Log file)"+fileformat
+    txtfilename = n_docpath+"/"+n_docfolder+"_Frames to Render "+frames+"_(Log file)"+fileformat
     print "Collected log saved in " + txtfilename
 
     f=open(txtfilename,"w")
@@ -1399,7 +1404,12 @@ def export_to_renderfarm():
     #Safety checks settings in the render engine
     if render_engine == ARNOLD_RENDERER:
         Arnold_Safety_Checks()
-        update_driversPath()
+        #drivers ops
+        padding = get_frames()
+        padding = padding[1]
+        padding = len(str(padding))
+        update_driversPath(padding)
+
     elif render_engine == REDSHIFT_RENDERER:
         Redshift_Safety_Checks()
     elif render_engine == OCTANE_RENDERER:
