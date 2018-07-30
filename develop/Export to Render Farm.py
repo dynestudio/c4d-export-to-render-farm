@@ -1,13 +1,17 @@
 """
-Export to Render Farm_v09
-Thanks for download - for commercial and all uses.
+Export to Render Farm - C4D script 0.9 wip 03
+Thanks for download - for commercial and personal uses.
+Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
-be.net/dyne
+http://dyne.studio/
 Writen by: Carlos Dordelly
+Special thanks: Pancho Contreras, Terry Williams & Roberto Gonzalez.
 
-Colleect your files and set more easily your render paths
-Date: 27/11/2017
-Written and tested in Cinema 4D R18 / R17 / R16 - Maybe works in older versions.
+Export to Render Farm provides a alternative way to collect a c4d file with additional features.
+Date: 08/12/2017
+Written and tested in Cinema 4D R18 / R17 / R16 - Not tested in older versions.
+
+Export to Render Farm belongs to Dyne Tools (group of digital tools from dyne).
 
 """
 
@@ -167,7 +171,7 @@ def Redshift_Safety_Checks():
          
         # setup the settings
         redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_DEBUG_DRAW_SAMPLES] = False
-        redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_RANDOMIZE_PATTERN] = True
+        redshiftRenderSettings[c4d.REDSHIFT_RENDERER_UNIFIED_RANDOMIZE_PATTERN] = False
         redshiftRenderSettings[c4d.REDSHIFT_RENDERER_AOV_FIX_RAW_HALO_ARTIFACTS] = True
         redshiftRenderSettings[c4d.REDSHIFT_RENDERER_CONSERVE_GI_REFLECTION_ENERGY] = True
         redshiftRenderSettings[c4d.REDSHIFT_RENDERER_AUTOMATIC_MEMORY_MANAGEMENT] = True
@@ -935,9 +939,16 @@ def export_to_renderfarm():
     write_txt(n_docpath, n_docname, n_docfolder, render_log, output_data_format)
     print "Collected file: "+n_docname
 
-    #Close the collected file
-    c4d.CallCommand(12664, 12664) # Close collected project
-    c4d.CallCommand(52000, 2) # Recent Files
+    #open question dialog
+    string_open_collect = "Do you want to open the collected file?"
+    open_collect_question = c4d.gui.QuestionDialog(string_open_collect)
+
+    if open_collect_question == True:
+        None
+    else:
+        #Close the collected file
+        c4d.CallCommand(12664, 12664) # Close collected project
+        c4d.CallCommand(52000, 2) # Recent Files
     
     #Collect finish dialog
     print "Successfully Exported! Happy Rendering ;)"
