@@ -1,12 +1,12 @@
 """
-Export to Render Farm_v08
+Export to Render Farm_v09
 Thanks for download - for commercial and all uses.
 
 be.net/dyne
 Writen by: Carlos Dordelly
 
 Colleect your files and set more easily your render paths
-Date: 13/11/2017
+Date: 27/11/2017
 Written and tested in Cinema 4D R18 / R17 / R16 - Maybe works in older versions.
 
 """
@@ -28,6 +28,8 @@ STANDARD_RENDERER = 0
 #render data global ids
 renderdata = doc.GetActiveRenderData()
 rdata = renderdata.GetData()
+Beauty_path = "./$prj/$prj_Beauty"
+MP_path = "./$prj/$prj_MP"
 
 #global ids
 doc=c4d.documents.GetActiveDocument()
@@ -459,7 +461,15 @@ def Octane_Safety_Checks():
             raise BaseException("Failed to find Octane render settings")
          
         # setup the settings
-        None
+        octaneRenderSettings[c4d.SET_PASSES_ENABLED] = True
+        octaneRenderSettings[c4d.SET_PASSES_SAVEPATH] = MP_path
+        Pxr24 = 5 #pixar EXR compression
+        octaneRenderSettings[c4d.SET_PASSES_EXR_COMPR] = Pxr24
+        octaneRenderSettings[c4d.SET_PASSES_SHOWPASSES] = True
+        octaneRenderSettings[c4d.SET_PASSES_SAVE_MAINPASS] = True
+        octaneRenderSettings[c4d.SET_PASSES_MULTILAYER] = True
+        octaneRenderSettings[c4d.SET_PASSES_IMAGECOLORPROFILE] = 1
+        octaneRenderSettings[c4d.SET_PASSES_TONEMAPTYPE] = 1
 
 def Octane_Log_Data():
         # find the Octane video post data   
@@ -468,12 +478,13 @@ def Octane_Log_Data():
             raise BaseException("Failed to find Octane render settings")
         
         # settings to log
+        temp_log = "Octane does not support log yet."
         None
 
         #lists to log
         octane_samples_list = []
         octane_depth_list = []
-        octane_log_list = []
+        octane_log_list = [temp_log]
 
         return octane_log_list
 
@@ -846,6 +857,8 @@ def export_to_renderfarm():
     #Beauty
     if render_engine == ARNOLD_RENDERER:
         BeautyFormat = ARNOLD_DUMMYFORMAT #ArnoldDummy Format
+    elif render_engine == REDSHIFT_RENDERER:
+        BeautyFormat = ARNOLD_DUMMYFORMAT #ArnoldDummy Format
     else:
         BeautyFormat = c4d.FILTER_JPG #Beauty reference in JPG format
     #MultiPass
@@ -871,8 +884,14 @@ def export_to_renderfarm():
     renderdata.SetData(container)
 
     #set render paths
-    renderdata[c4d.RDATA_PATH] = "./$prj/$prj_Beauty" #Beauty export is not necessary with some 3rd party renders just like C4DtoA
-    renderdata[c4d.RDATA_MULTIPASS_FILENAME] = "./$prj/$prj_MP" #MP = Multipass
+    renderdata[c4d.RDATA_PATH] = Beauty_path #beauty export is not necessary with some 3rd party renders just like C4DtoA
+
+    if render_engine == OCTANE_RENDERER:
+        renderdata[c4d.RDATA_MULTIPASS_FILENAME] = ""
+        renderdata[c4d.RDATA_MULTIPASS_SAVEIMAGE] = False
+    else:
+        renderdata[c4d.RDATA_MULTIPASS_SAVEIMAGE] = True
+        renderdata[c4d.RDATA_MULTIPASS_FILENAME] = MP_path #MP = Multipass
     
     #Safety checks settings in render engine
     if render_engine == ARNOLD_RENDERER:
