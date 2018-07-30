@@ -3,23 +3,28 @@ import c4d
 OCTANE_LIVEPLUGIN = 1029499
 OCTANE_RENDERER = 1029525
 
-def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
+renderdata = doc.GetActiveRenderData()
 
+def GetOctaneRenderSettings():
+
+    # find the active Octane render settings
+    videopost = renderdata.GetFirstVideoPost()
+    while videopost:
+        if videopost.GetType() == OCTANE_RENDERER:
+            return videopost;
+        videopost = videopost.GetNext()
+             
+    return None
+
+def Octane_Log_Data(): #thanks to the octane user mpazera for the settings base code
+    #octane IDs
     sBC = doc.GetDataInstance();
     data = sBC.GetContainerInstance(OCTANE_LIVEPLUGIN)
-        
-    renderdata = doc.GetActiveRenderData()
-    octane = renderdata.GetFirstVideoPost()
-
+    octane = GetOctaneRenderSettings()
+    if octane is None:
+            raise BaseException("Failed to find Octane render settings")
     kernelRS = octane[3001]
     kernelLV = int(data.GetReal(3001)) 
-
-    #Transfer Data From LV Settings
-    if renderdata[c4d.RDATA_RENDERENGINE] != OCTANE_RENDERER:
-        renderdata[c4d.RDATA_RENDERENGINE] = OCTANE_RENDERER
-    else:
-        None
-    
     octane[3001] = int(data.GetReal(3001))
 
     #Info Kernel
@@ -138,6 +143,8 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
             min_net_traffic = "Minimize net traffic: " + "Enabled"
         else:
             min_net_traffic = "Minimize net traffic: " + "Disabled"
+
+        adaptive_sampling_list = 
 
         adaptive_sampling = octane[c4d.SET_DIRECT_ADAPTIVE_SAMPLING] = bool(data.GetReal(c4d.SET_DIRECT_ADAPTIVE_SAMPLING))
         if adaptive_sampling == True:
@@ -304,6 +311,8 @@ def Octane_Log_Data(): #thanks to the octane user mpazera for the base code
 
     for i in octane_kernelsettings_list:
         octane_log_list.append(i)
+
+    return octane_log_list
 
 if __name__=='__main__':
     Octane_Log_Data()
