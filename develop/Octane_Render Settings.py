@@ -3,6 +3,8 @@ import c4d
 OCTANE_LIVEPLUGIN = 1029499
 OCTANE_RENDERER = 1029525
 
+"string for test commit"
+
 renderdata = doc.GetActiveRenderData()
 
 def GetOctaneRenderSettings():
