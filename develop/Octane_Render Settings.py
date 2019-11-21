@@ -1,7 +1,5 @@
 import c4d
 
-"commit test 02"
-
 OCTANE_LIVEPLUGIN = 1029499
 OCTANE_RENDERER = 1029525
 
