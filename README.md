@@ -1,7 +1,6 @@
 ![Export-to-Render-Farm_04_Header-160px.png](https://bitbucket.org/repo/gk78rnE/images/1495520629-Export-to-Render-Farm_04_Header-160px.png)
 
 **Export to Render Farm** provides a alternative way to collect a c4d file with additional features.   
-Writen by: Carlos Dordelly
 
 ----------------
 
