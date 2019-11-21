@@ -80,7 +80,10 @@ Our tools are free and open source, we hope that you can find it useful or that 
 
 ### Visit Us  
 [dyne.studio](http://dyne.studio/)   
-[facebook](https://www.facebook.com/dyne.estudio/)   
-[instagram](https://www.instagram.com/dyne.estudio/)   
-[vimeo](https://vimeo.com/dynestudio)   
-[twitter](https://twitter.com/dynestudio)
+[youtube](http://bit.ly/dyne_yt)   
+[facebook](http://bit.ly/dyne_fb)   
+[instagram](http://bit.ly/dyne_ig)  
+[twitter](http://bit.ly/dyne_tw)   
+[vimeo](http://bit.ly/dyne_vimeo)
+
+   
