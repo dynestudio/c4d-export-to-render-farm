@@ -5,13 +5,7 @@ Writen by: Carlos Dordelly
 
 ----------------
 
-Contents:    
-       
-[TOC]
-
-----------------
-
-###[Overview](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/wiki/Home#markdown-header-overview)   
+### Overview
 The utility of this script is speed up and improve our collect workflow when we render with multiple machines with TR (local team render, server or client) or a render manager software. Unlike the original function from c4d, this script ask you if you want to open or not the collected file and it create a detailed log with the render information. You can use it to upload scenes to render farms services too and keep the log information for you.   
 
 Supported render engines for log:   
@@ -30,7 +24,7 @@ You can view which parameters are safety checks [here](https://bitbucket.org/dyn
 
 ----------------
 
-###[Features](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/wiki/Home#markdown-header-features)  
+### Features
 -Improve your collect workflow from your scenes.  
 -Smart render paths (set render paths in the same c4d file folder with c4d tokens).   
 -Choose if you want to open or not the collected file.   
@@ -40,7 +34,7 @@ You can view which parameters are safety checks [here](https://bitbucket.org/dyn
 
 ----------------
 
-###[Install Guide](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/wiki/Home#markdown-header-install-guide)  
+### Install Guide  
 To install the script you need to copy the .py file and icon to c4d scripts folder:   
 WIN:   
 ./C4D RXX root folder / library / scripts   
@@ -52,27 +46,27 @@ Compatible with: R18, R17, R16 versions (not tested in older versions, maybe wor
 
 ----------------
 
-###[Mailing List](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/wiki/Home#markdown-header-mailing-list)   
+### Mailing List   
 Please email **info@dynetv.com** if you have any questions including the bug reports or feature requests. If you are not in the mailing list please send us email and we will explain how to be a part of the mailing list and be notified with new releases.   
 
 And if you feel in a good mood send us where are you from, your Behance or something where we can view what you do and know each other and who knows if one day we can share some beers :beers:.   
 
 ----------------
 
-###[Download](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/wiki/Home#markdown-header-download)   
+### Download 
 Download the oficial release here: [*this script is still in development.*](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/downloads/)   
 Download the development version here: [link.](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/downloads/)   
 
 ----------------
 
-###[Thanks to](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/wiki/Home#markdown-header-thanks-to)   
+### Thanks to
 * Francisco "Pancho" Contreras.
 * Terry Williams.
 * Roberto Gonzalez.
 
 ----------------
 
-###[License](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/wiki/Home#markdown-header-license)   
+### License  
 Export to Render Farm - v0.9   
 For commercial and personal uses.   
 The Export to Render Farm v0.9 granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.   
@@ -80,12 +74,12 @@ Export to Render Farm belongs to Dyne Tools (group of digital tools from dyne).
 
 ----------------
 
-###[Support Us](https://bitbucket.org/dynestudio/dyne-tools-read-first/wiki/Home#markdown-header-download)   
+### Support Us  
 Our tools are free and open source, we hope that you can find it useful or that we can develop one tool one day with you. So if you feel compelled to express your gratitude please feel free to do so through this [link](https://www.paypal.me/cdordelly), you can name your own price or think about it as buying us a coffee or beer ;). 
 
 ----------------
 
-###[Visit Us](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/wiki/Home#markdown-header-visit-us)   
+### Visit Us  
 [dyne.studio](http://dyne.studio/)   
 [facebook](https://www.facebook.com/dyne.estudio/)   
 [instagram](https://www.instagram.com/dyne.estudio/)   
