@@ -4,14 +4,9 @@ Thanks for download - for commercial and personal uses.
 Export to Render Farm granted shall not be copied, distributed, or-sold, offered for resale, transferred in whole or in part except that you may make one copy for archive purposes only.
 
 http://dyne.studio/
-Writen by: Carlos Dordelly
-Special thanks: Pancho Contreras, Terry Williams & Roberto Gonzalez.
 
 Export to Render Farm provides a alternative way to collect a c4d file with additional features.
-Date start: 13/feb/2018
-Date version: 09/jun/2018
-Date end: --
-Written and tested in Cinema 4D R19 / R18 / R17 / R16.
+Written and tested in Cinema 4D R21 / R20 / R19 - Maybe work in other versions.
 
 Export to Render Farm belongs to Dyne Tools (group of digital tools from dyne).
 
