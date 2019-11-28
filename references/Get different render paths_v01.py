@@ -6,8 +6,8 @@ docname = doc.GetDocumentName()
 docpath = doc.GetDocumentPath()
 
 # render global ids
-beauty_path  = ".\\$prj\\$prj_proxy"
-mp_path      = ".\\$prj\\$prj_mp"
+beauty_path  = ".\\$prj\\$prj_proxy_"
+mp_path      = ".\\$prj\\$prj_mp_"
 
 # docpath = "Y:\\My Drive\\Dyne - Works\\Canda Dry - FAXXI '19\\04_3D\\01_C4D\\04_Anim"
 

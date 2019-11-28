@@ -42,8 +42,8 @@ C4DAIP_DRIVER_TIFF_FILENAME     = 1913388456
 # render data global ids
 renderdata   = doc.GetActiveRenderData()
 rdata        = renderdata.GetData()
-render_beauty_path  = ".\\$prj\\$prj_proxy"
-render_mp_path      = ".\\$prj\\$prj_mp"  
+render_beauty_path  = ".\\$prj\\$prj_proxy_"
+render_mp_path      = ".\\$prj\\$prj_mp_"  
 team_server_path    = ".\\users\\admin\\$prj\\results\\$prj_"
 
 # document global ids
