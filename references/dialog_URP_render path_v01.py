@@ -1,6 +1,7 @@
 import c4d
 from c4d import gui
 
+# update render path dialog
 class OptionsDialog(gui.GeDialog):
     IDC_GROUP_01         = 10000
     IDC_LABELNAME_01     = 10010
@@ -12,8 +13,8 @@ class OptionsDialog(gui.GeDialog):
     IDC_LIST_02_INPUT01  = 10070
     IDC_LIST_02_INPUT02  = 10080
     IDC_LIST_02_INPUT03  = 10090
-    STR_RNDR_TYPE01      = "Still"
-    STR_RNDR_TYPE02      = "Animation"
+    STR_RENDER_TYPE01    = "Still"
+    STR_RENDER_TYPE02    = "Animation"
     STR_PATH_TYPE01      = "Drive Path"
     STR_PATH_TYPE02      = "Relative Project Path"
     STR_PATH_TYPE03      = "Team Server Path"
@@ -29,8 +30,8 @@ class OptionsDialog(gui.GeDialog):
         self.AddStaticText(self.IDC_LABELNAME_01, c4d.BFH_LEFT, name = 'Select render type . . . .') 
         # combo box UI - render type
         self.AddComboBox(self.IDC_LIST_01, c4d.BFH_CENTER, initw = 200, inith = 12, specialalign = False)
-        self.AddChild(self.IDC_LIST_01, self.IDC_LIST_01_INPUT01, self.STR_RNDR_TYPE01)
-        self.AddChild(self.IDC_LIST_01, self.IDC_LIST_01_INPUT02, self.STR_RNDR_TYPE02)
+        self.AddChild(self.IDC_LIST_01, self.IDC_LIST_01_INPUT01, self.STR_RENDER_TYPE01)
+        self.AddChild(self.IDC_LIST_01, self.IDC_LIST_01_INPUT02, self.STR_RENDER_TYPE02)
         
         # statics text - description UI
         self.AddStaticText(self.IDC_LABELNAME_02, c4d.BFH_LEFT, name = 'Select path type . . . . . .') 
@@ -56,8 +57,8 @@ class OptionsDialog(gui.GeDialog):
     def Command(self, id, msg):
         if id == c4d.IDC_OK:
             self.ok = True
-            self.FIND_RNDR_TYPE = self.GetInt32(self.IDC_LIST_01)
-            self.FIND_RNDR_PATH = self.GetInt32(self.IDC_LIST_02)
+            self.FIND_RENDER_TYPE = self.GetInt32(self.IDC_LIST_01)
+            self.FIND_RENDER_PATH = self.GetInt32(self.IDC_LIST_02)
             self.Close()
         elif id == c4d.IDC_CANCEL:
             self.Close()      
@@ -71,11 +72,13 @@ def main():
     if not dlg.ok:
         return
 
-    dlg_rndr_type = dlg.FIND_RNDR_TYPE
-    dlg_rndr_path = dlg.FIND_RNDR_PATH
+    dlg_render_type = dlg.FIND_RENDER_TYPE
+    dlg_render_path = dlg.FIND_RENDER_PATH
 
-    print dlg_rndr_type
-    print dlg_rndr_path
+    # ------------------------------------
+
+    print dlg_render_type
+    print dlg_render_path
     print dlg.IDC_LIST_01_INPUT02
 
 if __name__=='__main__':
