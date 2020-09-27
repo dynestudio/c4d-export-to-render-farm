@@ -45,13 +45,6 @@ Compatible with: R18, R17, R16 versions (not tested in older versions, maybe wor
 
 ----------------
 
-### Mailing List   
-Please email **info@dynetv.com** if you have any questions including the bug reports or feature requests. If you are not in the mailing list please send us email and we will explain how to be a part of the mailing list and be notified with new releases.   
-
-And if you feel in a good mood send us where are you from, your Behance or something where we can view what you do and know each other and who knows if one day we can share some beers :beers:.   
-
-----------------
-
 ### Download 
 Download the oficial release here: [*this script is still in development.*](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/downloads/)   
 Download the development version here: [link.](https://bitbucket.org/dynestudio/c4d-export-to-render-farm/downloads/)   
